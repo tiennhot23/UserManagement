@@ -1,4 +1,8 @@
 const connection = require('../../connection')
+const bcrypt = require('bcrypt')
+const User = require('../../middlewares/user')
+
+const user = new User();
 
 
 exports.view = (req, res) => {
@@ -38,11 +42,13 @@ exports.create = (req, res) => {
     last_name,
     email,
     phone,
-    comments
+    comments,
+    password
   } = req.body
-  let searchTerm = req.body.search
 
-  connection.query('INSERT INTO user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ?', [first_name, last_name, email, phone, comments], (err, rows) => {
+  console.log(req.body.password)
+
+  connection.query('INSERT INTO user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ?, password = ?', [first_name, last_name, email, phone, comments, password], (err, rows) => {
     if (!err) {
       res.render('add-user', {
         alert: 'User added successfully.'
@@ -113,6 +119,40 @@ exports.viewall = (req, res) => {
       })
     } else {
       console.log(err)
+    }
+  })
+}
+
+exports.formlogin = (req, res) => {
+  res.render('login')
+}
+
+exports.login = (req, res) => {
+  console.log(req.body.password)
+  user.login(req.body.username, req.body.password, function (result) {
+    if (result) {
+      req.session.user = result
+      res.redirect('/')
+    } else {
+      res.render('login', {
+        alert: `Username or password incorrect.`
+      })
+    }
+  })
+}
+
+exports.formRegister = (req, res) => {
+  res.render('register')
+}
+
+exports.register = (req, res) => {
+  user.login(req.body.username, req.body.password, function (result) {
+    if (result) {
+      req.session.user = result;
+      req.session.opp = 1;
+      res.redirect('/home');
+    } else {
+      res.send('Username/Password incorrect!');
     }
   })
 }

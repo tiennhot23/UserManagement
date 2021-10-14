@@ -1,0 +1,26 @@
+{{#if alert}}
+<div class="col-6 alert alert-success alert-dismissible fade show" role="alert">
+    {{alert}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{{/if}}
+
+<form method="POST" action="/login" >
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingInput"
+                placeholder="Username" name="username">
+            <label for="floatingInput">Username</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="floatingInput"
+                placeholder="Password" name="password">
+            <label for="floatingInput">Password</label>
+        </div>
+    </div>
+    <div class="col-6 d-grid">
+        <button class="btn btn-primary" type="submit">Login</button>
+    </div>
+</form>
