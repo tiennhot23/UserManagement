@@ -4,58 +4,78 @@ const bcrypt = require('bcrypt')
 function User() {}
 
 User.prototype = {
-    find : function(username = null, callback)
-    {
-        let sql = `SELECT * FROM user WHERE last_name LIKE ?`
-
-        connection.query(sql, username, function(err, result) {
-            if(err) throw err
-
-            if(result.length) {
-                callback(result[0])
-            }else {
-                callback(null)
-            }
+    getactive: function (callback) {
+        let sql = `SELECT * FROM user WHERE status = "active"`
+        connection.query(sql, (err, rows) => {
+            callback(err, rows)
         })
     },
 
-    // This function will insert data into the database. (create a new user)
-    // body is an object 
-    create : function(body, callback) 
-    {
+    viewuser: function (id, callback) {
+        let sql = `SELECT * FROM user WHERE id = ?`
+        connection.query(sql, id, (err, rows) => {
+            callback(err, rows)
+        })
+    },
+
+    find: function (searchTerm, callback) {
+        let sql = `SELECT * FROM user WHERE first_name LIKE ? OR last_name LIKE ?`
+        connection.query(sql, ['%' + searchTerm + '%', '%' + searchTerm + '%'], (err, rows) => {
+            callback(err, rows)
+        })
+    },
+
+    finduser: function (username = null, callback) {
+        let sql = `SELECT * FROM user WHERE last_name = ?`
+
+        connection.query(sql, username, function (err, result) {
+            callback(err, result)
+        })
+    },
+
+    login: function (user, password, callback) {
+
+        if (user) {
+            if (bcrypt.compareSync(password, user.password)) {
+                callback(user)
+                return
+            }
+        }
+        callback(null)
+    },
+
+    create: function (body, callback) {
 
         var pwd = body.password
-        // Hash the password before insert it into the database.
-        body.password = bcrypt.hashSync(pwd,10)
+        body.password = bcrypt.hashSync(pwd, 10)
 
-        // this array will contain the values of the fields.
         var bind = []
-        // loop in the attributes of the object and push the values into the bind array.
-        for(prop in body){
+        for (prop in body) {
             bind.push(body[prop])
         }
-        // prepare the sql query
-        let sql = `INSERT INTO users(username, fullname, password) VALUES (?, ?, ?)`
-        // call the query give it the sql string and the values (bind array)
-        db.query(sql, bind, function(err, result) {
-            if(err) throw err
-            // return the last inserted id. if there is no error
-            callback(result.insertId)
+        let sql = `INSERT INTO user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ?, password = ?`
+        connection.query(sql, bind, function (err, result) {
+            callback(err, result)
         })
     },
 
-    login : function(username, password, callback)
-    {
-        this.find(username, function(user) {
-            if(user) {
-                if(bcrypt.compareSync(password, user.password)) {
-                    callback(user)
-                    return
-                }  
-            }
-            callback(null)
+    update: function (body, id, callback) {
+        var bind = []
+        for (prop in body) {
+            bind.push(body[prop])
+        }
+        let sql = `UPDATE user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ? WHERE id = ${id}`
+        connection.query(sql, bind, function (err, result) {
+            callback(err, result)
         })
-    }
+    },
+
+    delete: function (id, callback) {
+        let sql = `UPDATE user SET status = ? WHERE id = ${id}`
+        connection.query(sql, 'removed', function (err, result) {
+            callback(err, result)
+        })
+    },
 
 }
 
