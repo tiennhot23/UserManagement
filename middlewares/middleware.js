@@ -38,7 +38,7 @@ middleware.nullrequest = (req, res, next) => {
 }
 
 middleware.requestTime = (req, res, next) => {
-    req.resquestTime = Date.now()
+    req.requestTime = new Date(Date.now()).toString()
     next()
 }
 
@@ -141,6 +141,10 @@ middleware.create = (req, res, next) => {
 }
 
 middleware.update = (req, res, next) => {
+    if(req.body.comments){
+        console.log(req.requestTime)
+        req.body.comments = req.body.comments + `\nThis comment is created at ${req.requestTime}`
+    }
     user.update(req.body, req.params.id, function (err, rows) {
         if (!err) {
             res.render('edit-user', {

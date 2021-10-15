@@ -45,10 +45,6 @@ User.prototype = {
     },
 
     create: function (body, callback) {
-
-        var pwd = body.password
-        body.password = bcrypt.hashSync(pwd, 10)
-
         var bind = []
         for (prop in body) {
             bind.push(body[prop])
