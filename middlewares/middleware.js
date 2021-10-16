@@ -27,8 +27,11 @@ middleware.logger = (req, res, next) => {
 }
 
 middleware.crypt = (req, res, next) => {
+    console.log('start middleware crypt')
+    console.log('Password trước khi mã hoá: ', req.body.password)
     var pwd = req.body.password
     req.body.password = bcrypt.hashSync(pwd, 10)
+    console.log('Password sau khi mã hoá: ', req.body.password)
     next()
 }
 
@@ -38,7 +41,9 @@ middleware.nullrequest = (req, res, next) => {
 }
 
 middleware.requestTime = (req, res, next) => {
+    console.log('start middleware requestTime')
     req.requestTime = new Date(Date.now()).toString()
+    console.log('Time: ', req.requestTime)
     next()
 }
 
@@ -61,6 +66,11 @@ middleware.finduser = (req, res, next) => {
         if (err) {
             res.render('404')
             return
+        }
+        if (!users[0]){
+            res.render('login', {
+                alert: `Username invalid`
+            })
         }
         req.user = users[0]
         next()
@@ -129,6 +139,11 @@ middleware.getactive = (req, res, next) => {
 }
 
 middleware.create = (req, res, next) => {
+    console.log('start middleware create')
+    if(req.body.comments){
+        req.body.comments = req.body.comments + `\nThis comment is created at ${req.requestTime}`
+    }
+    console.log('Nội dung cuối cùng của request: ', req.body)
     user.create(req.body, function (err, rows) {
         if (!err) {
             res.render('add-user', {
@@ -142,7 +157,6 @@ middleware.create = (req, res, next) => {
 
 middleware.update = (req, res, next) => {
     if(req.body.comments){
-        console.log(req.requestTime)
         req.body.comments = req.body.comments + `\nThis comment is created at ${req.requestTime}`
     }
     user.update(req.body, req.params.id, function (err, rows) {
@@ -159,15 +173,8 @@ middleware.update = (req, res, next) => {
 middleware.delete = (req, res, next) => {
     user.delete(req.params.id, function (err, rows) {
         if (!err) {
-            if (rows) {
-                res.render('home', {
-                    alert: 'Invalid user'
-                })
-            } else {
-                let removedUser = encodeURIComponent('User successeflly removed.')
-                res.redirect('/?removed=' + removedUser)
-            }
-
+            let removedUser = encodeURIComponent('User successeflly removed.')
+            res.redirect('/?removed=' + removedUser)
         } else {
             console.log(err)
             res.render('404')
