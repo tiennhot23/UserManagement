@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
-const connection = require('../connection')
-const User = require('./user')
+const User = require('../server/controllers/user')
 
 const user = new User();
 
@@ -68,6 +67,7 @@ middleware.checkrequest = (req, res, next) => {
 }
 
 middleware.requestTime = (err, req, res, next) => {
+    console.log('start middleware requestTime')
     if(err){
         if(req.path.includes('adduser')){
             res.redirect('/adduser?e=' + encodeURIComponent(err.message))
@@ -77,7 +77,6 @@ middleware.requestTime = (err, req, res, next) => {
         }
         return
     }
-    console.log('start middleware requestTime')
     req.requestTime = new Date(Date.now()).toString()
     console.log('Time: ', req.requestTime)
     next()
