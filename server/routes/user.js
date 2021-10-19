@@ -1,21 +1,20 @@
 const express = require('express')
 const router = express.Router()
-const userController = require('../controllers/userController')
 const middleware = require('../../middlewares/middleware')
 
 router.get('/', middleware.getactive)
 router.post('/', middleware.find)
 router.get('/viewuser/:id', middleware.viewuser)
-router.get('/login', userController.formlogin)
+router.get('/login', middleware.formlogin)
 router.post('/login', middleware.finduser, middleware.login)
 
 router.use(middleware.authorization)
 
 router.get('/logout', middleware.logout)
-router.get('/adduser', userController.form)
-router.post('/adduser', middleware.crypt, middleware.requestTime, middleware.create)
-router.get('/edituser/:id', middleware.edit)
-router.post('/edituser/:id', middleware.requestTime, middleware.update)
+router.get('/adduser', middleware.formadd)
+router.post('/adduser', middleware.checkrequest, middleware.requestTime, middleware.crypt, middleware.create)
+router.get('/edituser/:id', middleware.formedit)
+router.post('/edituser/:id',middleware.checkrequest, middleware.requestTime, middleware.update)
 router.get('/deleteuser/:id', middleware.delete)
 
 

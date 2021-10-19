@@ -36,11 +36,47 @@ middleware.crypt = (req, res, next) => {
 }
 
 
-middleware.nullrequest = (req, res, next) => {
-
+middleware.checkrequest = (req, res, next) => {
+    if(req.body.first_name.trim().length == 0){
+        next(new Error("First Name không được trống"))
+        return
+    }
+    if(req.body.last_name.trim().length == 0){
+        next(new Error("Last Name không được trống"))
+        return
+    }
+    if(req.body.email.trim().length == 0){
+        next(new Error("Email không được trống"))
+        return
+    }
+    if(req.body.phone.trim().length == 0){
+        next(new Error("Phone không được trống"))
+        return
+    }
+    if(req.body.password.trim().length == 0){
+        next(new Error("Password không được trống"))
+        return
+    }
+    if(!validateEmail(req.body.email)){
+        next(new Error("Email sai định dạng"))
+        return
+    }
+    if(!validatePhone(req.body.phone)){
+        next(new Error("Phone sai định dạng"))
+        return
+    }
 }
 
-middleware.requestTime = (req, res, next) => {
+middleware.requestTime = (err, req, res, next) => {
+    if(err){
+        if(req.path.includes('adduser')){
+            res.redirect('/adduser?e=' + encodeURIComponent(err.message))
+        }
+        if(req.path.includes('edituser')){
+            res.redirect(`/edituser/${req.params.id}?e=` + encodeURIComponent(err.message))
+        }
+        return
+    }
     console.log('start middleware requestTime')
     req.requestTime = new Date(Date.now()).toString()
     console.log('Time: ', req.requestTime)
@@ -110,10 +146,12 @@ middleware.logout = (req, res, next) => {
     }
 }
 
-middleware.edit = (req, res, next) => {
+middleware.formedit = (req, res, next) => {
+    let e = req.query.e
     user.viewuser(req.params.id, function (err, rows) {
         if (rows) {
             res.render('edit-user', {
+                alert: e,
                 rows
             })
         } else {
@@ -122,6 +160,17 @@ middleware.edit = (req, res, next) => {
             })
         }
     })
+}
+
+middleware.formadd = (req, res, next) => {
+    let e = req.query.e
+    res.render('add-user', {
+        alert: e
+    })
+}
+
+middleware.formlogin = (req, res, next) => {
+    res.render('login')
 }
 
 middleware.getactive = (req, res, next) => {
@@ -180,6 +229,16 @@ middleware.delete = (req, res, next) => {
             res.render('404')
         }
     })
+}
+
+function validateEmail(email) {
+    const reg = /^[a-z][a-z0-9]+@[a-z]+(\.[a-z]{2,4}){1,2}$/
+    return reg.test(String(email).toLowerCase())
+}
+
+function validatePhone(phone) {
+    const reg = /^[0][0-9]{9}$/
+    return reg.test(String(phone))
 }
 
 module.exports = middleware
