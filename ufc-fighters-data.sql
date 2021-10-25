@@ -17,4 +17,5 @@ INSERT INTO `user`
 (NULL, 'Tecia',       'Torres ',      'ttorres@ufc.com',       '012345 678910', '',          'active', '123'),
 (NULL, 'Ronda',       'Rousey ',      'rrousey@ufc.com',       '012345 678910', '',          'active', '123'),
 (NULL, 'Holly',       'Holm ',        'hholm@ufc.com',         '012345 678910', '',          'active', '123'),
-(NULL, 'Joanna',      'Jedrzejczyk ', 'jjedrzejczyk@ufc.com',  '012345 678910', '',          'active', '123')
+(NULL, 'Joanna',      'Jedrzejczyk ', 'jjedrzejczyk@ufc.com',  '012345 678910', '',          'active', '123'),
+(NULL, 'sa',			'sa ',			'sa@gmail.com',			'0103873948', '',				'active', '$2b$10$Nvo.1E/DoE2yFiTIrxDJq.ZyaW4pErq3w9SERqpwgEo9jeHKyuqzW')
